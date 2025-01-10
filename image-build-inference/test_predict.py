@@ -1,18 +1,6 @@
 import requests
 import json
 
-#locally
-url='http://localhost:8080/invocations'
-bucket = 'spot-bot-asset'
-image_uri = 'end/car.jpg'
-test_data = {
-    'bucket' : bucket,
-    'image_uri' : image_uri,
-    'content_type': "application/json",
-}
-payload = json.dumps(test_data)
-#r = requests.post(url,data=payload)
-
 #on sagemaker
 import boto3
 from botocore.config import Config
@@ -25,11 +13,11 @@ config = Config(
         'max_attempts': 0
     }
 )
-def infer(input_image):
+def infer(bucket, input_image):
     from boto3.session import Session
     import json
 
-    bucket = 'xxxx'
+    
     image_uri = input_image
     test_data = {
         'bucket' : bucket,
@@ -51,4 +39,4 @@ def infer(input_image):
     result = json.loads(response["Body"].read())
     print (result)
 
-infer('tmp/20241102.jpg')
+infer('bucket-name','tmp/20241102.jpg')

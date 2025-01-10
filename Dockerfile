@@ -1,4 +1,6 @@
-FROM registry.baidubce.com/paddlepaddle/paddle:2.2.2-gpu-cuda10.2-cudnn7
+#FROM registry.baidubce.com/paddlepaddle/paddle:2.2.2-gpu-cuda10.2-cudnn7
+#FROM paddlepaddle/paddle:3.0.0b1-gpu-cuda11.8-cudnn8.6-trt8.5
+FROM registry.baidubce.com/paddlepaddle/paddle:2.6.1-gpu-cuda11.2-cudnn8.2-trt8.0
 
 ENV LANG=en_US.utf8
 ENV LANG=C.UTF-8
@@ -10,21 +12,19 @@ ENV PATH="/opt/program:${PATH}"
 RUN pip3 install --upgrade pip
 
 ## install flask
-RUN pip3 install networkx==2.3 flask gevent gunicorn boto3 paddleocr==2.0.1
+#RUN pip3 install networkx==2.8 flask gevent gunicorn boto3 paddleocr==2.9.1
+RUN pip3 install flask gevent gunicorn boto3 paddleocr==2.9.1
 
-RUN pip3 install paddlepaddle-gpu==2.2.2 -i https://mirror.baidu.com/pypi/simple
-RUN pip3 install protobuf==3.20.0
+#RUN pip3 install paddlepaddle-gpu -i https://mirror.baidu.com/pypi/simple
+
 #add folder
-RUN git clone -b release/2.1 https://github.com/PaddlePaddle/PaddleOCR.git /opt/program/
+RUN git clone -b release/2.9 https://github.com/PaddlePaddle/PaddleOCR.git /opt/program/
 
 #download model for inference
 RUN mkdir /opt/program/inference/
 RUN cd /opt/program/inference/
 RUN wget -P /opt/program/inference/ https://paddleocr.bj.bcebos.com/dygraph_v2.0/ch/ch_ppocr_server_v2.0_det_infer.tar && tar -xf /opt/program/inference/ch_ppocr_server_v2.0_det_infer.tar -C /opt/program/inference/ && rm -rf /opt/program/inference/ch_ppocr_server_v2.0_det_infer.tar
 RUN wget -P /opt/program/inference/ https://paddleocr.bj.bcebos.com/dygraph_v2.0/ch/ch_ppocr_mobile_v2.0_cls_infer.tar && tar -xf /opt/program/inference/ch_ppocr_mobile_v2.0_cls_infer.tar -C /opt/program/inference/ && rm -rf /opt/program/inference/ch_ppocr_mobile_v2.0_cls_infer.tar
-RUN mkdir -p /opt/ml/model || cd /opt/ml/model 
-RUN wget -P /opt/ml/model/ https://paddleocr.bj.bcebos.com/dygraph_v2.0/ch/ch_ppocr_mobile_v2.0_rec_infer.tar
-
 
 ### Install nginx notebook
 RUN apt-get -y update && apt-get install -y --no-install-recommends \
@@ -41,7 +41,6 @@ RUN ln -sf /dev/stderr /var/log/nginx/error.log
 COPY paddle/* /opt/program/
 RUN chmod +x /opt/program/serve
 WORKDIR /opt/program
-
 
 
 
